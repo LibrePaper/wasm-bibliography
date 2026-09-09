@@ -1,0 +1,50 @@
+# Bibliographies: reading them, and setting the citations that refer to them.
+#
+# Two modules out of one crate, because they are fetched at different moments.
+# bibliography.wasm parses .bib files for the editor's completions and renders
+# nothing; citations.wasm is the markdown renderer with citation processing on
+# top, and is fetched only for a document that actually cites something.
+[package]
+name = "wasm-bibliography"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+# Never goes to crates.io: consumed by path while the repositories sit side by
+# side, and by git tag once they are pushed.
+publish = false
+description = "Bibliography parsing and citation rendering, as WebAssembly modules"
+repository = "https://github.com/LibrePaper/wasm-bibliography"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+# The renderer is the default; the parser alone is a smaller build of the same
+# crate, and the Makefile builds both.
+default = ["citations", "exports"]
+citations = ["dep:hayagriva", "dep:comrak", "dep:wasm-markdown"]
+# On for this crate's own module, and off when another crate links it as a
+# library: a `#[no_mangle]` export belongs to exactly one cdylib.
+exports = []
+
+[dependencies]
+wasm-helpers = { path = "../wasm-helpers" }
+# The renderer citations are set into. A real dependency rather than a copy:
+# citation processing rewrites the same syntax tree comrak produced.
+wasm-markdown = { path = "../wasm-markdown", optional = true, default-features = false }
+# .bib, parsed.
+biblatex = "0.12.0"
+# The library a parse produces crosses the ABI as JSON, and it is a structure
+# rather than the hundred bytes the other modules answer with.
+serde_json = "1"
+# CSL: styles, locales, and the formatting of a citation and its entry.
+hayagriva = { version = "0.10.1", optional = true }
+comrak = { version = "0.54", default-features = false, optional = true }
+
+# As small as it can be.
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
