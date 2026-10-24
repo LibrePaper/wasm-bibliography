@@ -834,4 +834,12 @@ mod tests {
         assert!(html.contains("p. 5"), "{html}");
         assert!(html.contains("p. 9"), "{html}");
     }
+
+    #[test]
+    fn math_is_carried_as_tex_beside_citations() {
+        let result = render("---\nbibliography: refs.bib\n---\nWith $x^2$ as @smith2020 shows.\n");
+        let html = result.output.unwrap().html().unwrap().to_string();
+        assert!(html.contains("<span data-math-style=\"inline\">x^2</span>"), "{html}");
+        assert!(html.contains("Smith"), "{html}");
+    }
 }
