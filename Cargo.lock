@@ -803,7 +803,7 @@ checksum = "b6c140620e7ffbb22c2dee59cafe6084a59b5ffc27a8859a5f0d494b5d52b6be"
 
 [[package]]
 name = "wasm-bibliography"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = [
  "biblatex",
  "comrak",
@@ -815,15 +815,16 @@ dependencies = [
 
 [[package]]
 name = "wasm-helpers"
-version = "0.1.0"
-source = "git+https://github.com/LibrePaper/wasm-helpers?tag=v0.1.1#29aeedcca6f8b407bab06952c6ea939e02a1b334"
+version = "0.3.3"
+source = "git+https://github.com/LibrePaper/wasm-helpers?tag=v0.3.3#5fcbca871980139441b77a0d4588917897bf13c6"
 
 [[package]]
 name = "wasm-markdown"
-version = "0.2.0"
-source = "git+https://github.com/LibrePaper/wasm-markdown?tag=v0.1.1#ecca5296f135eea4051b2a25c6f0277b6cc1f1a6"
+version = "0.4.0"
+source = "git+https://github.com/LibrePaper/wasm-markdown?tag=v0.4.0#d727e7c5435cb889cfdf1a1e6ba6c5e539bdf8b2"
 dependencies = [
  "comrak",
+ "serde_json",
  "wasm-helpers",
 ]
 
