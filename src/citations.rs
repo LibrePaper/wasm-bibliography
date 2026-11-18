@@ -3,7 +3,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use comrak::nodes::{Ast, AstNode, NodeValue};
-use comrak::{format_html, parse_document, Arena};
+use comrak::{format_html, parse_document, Arena, Options};
 use hayagriva::archive::ArchivedStyle;
 use hayagriva::citationberg::{IndependentStyle, Style};
 use hayagriva::{
@@ -186,12 +186,22 @@ pub fn compile_prepared(
         }
     }
     let mut body = String::new();
-    format_html(root, &options(), &mut body).expect("String writes cannot fail");
+    format_html(root, &page_options(), &mut body).expect("String writes cannot fail");
     let body = rewrite_images(&body, assets);
     Compiled {
         output: Some(RenderedDocument::Html(page::page(title, "", &body))),
         diagnostics,
     }
+}
+
+/// The options the page is rendered with: the markdown renderer's own, plus
+/// `data-sourcepos` on every block, so LibrePaper can map a reader's selection
+/// back to source lines. Parsing keeps `options()`, since positions are
+/// recorded whatever the renderer is asked to print.
+fn page_options() -> Options<'static> {
+    let mut options = options();
+    options.render.sourcepos = true;
+    options
 }
 
 fn is_escaped(source: &str, node: &AstNode<'_>, matched: &CitationMatch) -> bool {
@@ -833,6 +843,18 @@ mod tests {
         assert!(html.contains("3–4"), "{html}");
         assert!(html.contains("p. 5"), "{html}");
         assert!(html.contains("p. 9"), "{html}");
+    }
+
+    #[test]
+    fn cited_paragraph_carries_its_source_lines() {
+        let result = render(
+            "---\nbibliography: refs.bib\n---\nFirst paragraph.\n\nAs @smith2020 shows.\n",
+        );
+        let html = result.output.unwrap().html().unwrap().to_string();
+        assert!(html.contains("<p data-sourcepos=\"6:1-"), "{html}");
+        assert!(html.contains("Smith"), "{html}");
+        // Generated nodes carry no position, so the references list has none.
+        assert!(!html.contains("data-sourcepos=\"0:"), "{html}");
     }
 
     #[test]
