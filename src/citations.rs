@@ -847,9 +847,8 @@ mod tests {
 
     #[test]
     fn cited_paragraph_carries_its_source_lines() {
-        let result = render(
-            "---\nbibliography: refs.bib\n---\nFirst paragraph.\n\nAs @smith2020 shows.\n",
-        );
+        let result =
+            render("---\nbibliography: refs.bib\n---\nFirst paragraph.\n\nAs @smith2020 shows.\n");
         let html = result.output.unwrap().html().unwrap().to_string();
         assert!(html.contains("<p data-sourcepos=\"6:1-"), "{html}");
         assert!(html.contains("Smith"), "{html}");
@@ -861,7 +860,10 @@ mod tests {
     fn math_is_carried_as_tex_beside_citations() {
         let result = render("---\nbibliography: refs.bib\n---\nWith $x^2$ as @smith2020 shows.\n");
         let html = result.output.unwrap().html().unwrap().to_string();
-        assert!(html.contains("<span data-math-style=\"inline\">x^2</span>"), "{html}");
+        // The span also carries its `data-sourcepos`, so the attributes are
+        // checked apart.
+        assert!(html.contains("<span data-math-style=\"inline\""), "{html}");
+        assert!(html.contains(">x^2</span>"), "{html}");
         assert!(html.contains("Smith"), "{html}");
     }
 }
