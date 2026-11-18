@@ -6,7 +6,7 @@
 # top, and is fetched only for a document that actually cites something.
 [package]
 name = "wasm-bibliography"
-version = "0.1.4"
+version = "0.2.0"
 edition = "2021"
 license = "MIT"
 # Never goes to crates.io: consumed by path while the repositories sit side by
